@@ -5,7 +5,7 @@
 
 static const int sloppyfocus               = 1;
 static const int bypass_surface_visibility = 0;
-static const unsigned int borderpx         = 1;
+static const unsigned int borderpx         = 2;
 static const int showbar                   = 1;
 static const int topbar                    = 1;
 static const char *fonts[]                 = {"JetBrainsMonoNerdFont:size=12"};
