@@ -47,7 +47,7 @@ xdg-shell-protocol.h:
 		$(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml $@
 
 config.h:
-	cp config.def.h $@
+	cp config.def.h config.h
 clean:
 	rm -f dwl *.o *-protocol.h
 

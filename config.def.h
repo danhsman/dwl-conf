@@ -1,3 +1,5 @@
+#include <X11/XF86keysym.h>
+
 #define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
                         ((hex >> 16) & 0xFF) / 255.0f, \
                         ((hex >> 8) & 0xFF) / 255.0f, \
@@ -5,11 +7,26 @@
 
 static const int sloppyfocus               = 1;
 static const int bypass_surface_visibility = 0;
+
+static const int enablegaps = 1;
+static const int smartgaps = 0;
+static const int monoclegaps = 0;
+
 static const unsigned int borderpx         = 2;
+
+static const unsigned int gappih = 2;
+static const unsigned int gappiv = 2;
+static const unsigned int gappoh = 2;
+static const unsigned int gappov = 2;
+
 static const int showbar                   = 1;
 static const int topbar                    = 1;
 static const char *fonts[]                 = {"JetBrainsMonoNerdFont:size=12"};
 static const float rootcolor[]             = COLOR(0x000000ff);
+
+static const char *raisevol[] = {"wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
+static const char *lowervol[] = {"wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
+static const char *mutevol[] = {"wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
 
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f};
 static uint32_t colors[][3]                = {
@@ -26,6 +43,7 @@ static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 static int log_level = WLR_ERROR;
 
 static const char *const autostart[] = {
+  "pkill awww-daemon", NULL,
   "awww-daemon", NULL,
   "awww", "img", "/home/danhs/Wallpapers/tplt.png", NULL,
 };
@@ -93,10 +111,27 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_p,           incnmaster,       {.i = -1} },
 	{ MODKEY,                    XKB_KEY_h,           setmfact,         {.f = -0.05f} },
 	{ MODKEY,                    XKB_KEY_l,           setmfact,         {.f = +0.05f} },
+
+	{ MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_h,           incgaps,          {.i = +1 } },
+  { MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_l,           incgaps,          {.i = -1 } },
+  { MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,    XKB_KEY_H,         incogaps,      {.i = +1 } },
+  { MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,    XKB_KEY_L,         incogaps,      {.i = -1 } },
+  { MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_CTRL,     XKB_KEY_h,         incigaps,      {.i = +1 } },
+  { MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_CTRL,     XKB_KEY_l,         incigaps,      {.i = -1 } },
+  { MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_0,           togglegaps,        {0} },
+  { MODKEY|WLR_MODIFIER_LOGO|WLR_MODIFIER_SHIFT,    XKB_KEY_parenright,defaultgaps,    {0} },
+  { MODKEY,                    XKB_KEY_y,           incihgaps,        {.i = +1 } },
+  { MODKEY,                    XKB_KEY_o,           incihgaps,        {.i = -1 } },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_y,           incivgaps,        {.i = +1 } },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_o,           incivgaps,        {.i = -1 } },
+  { MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_y,           incohgaps,        {.i = +1 } },
+  { MODKEY|WLR_MODIFIER_LOGO,  XKB_KEY_o,           incohgaps,        {.i = -1 } },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Y,           incovgaps,        {.i = +1 } },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,           incovgaps,        {.i = -1 } },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      zoom,             {0} },
 	{ MODKEY,                    XKB_KEY_Tab,         view,             {0} },
 	{ MODKEY,                    XKB_KEY_q,           killclient,       {0} },
-	{ MODKEY,                    XKB_KEY_t,           setlayout,        {.v = &layouts[0]} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_t,           setlayout,        {.v = &layouts[0]} },
 	{ MODKEY,                    XKB_KEY_f,           setlayout,        {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_m,           setlayout,        {.v = &layouts[2]} },
 	{ MODKEY,                    XKB_KEY_space,       setlayout,        {0} },
@@ -108,6 +143,11 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,        tagmon,           {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,     tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+
+  {0, XF86XK_AudioRaiseVolume, spawn, {.v = raisevol} },
+  {0, XF86XK_AudioLowerVolume, spawn, {.v = lowervol} },
+  {0, XF86XK_AudioMute, spawn, {.v = mutevol} },
+
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                        0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                            1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                    2),
