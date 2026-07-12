@@ -28,6 +28,11 @@ static const char *raisevol[] = {"wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", 
 static const char *lowervol[] = {"wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
 static const char *mutevol[] = {"wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
 
+static const char *play[] = {"playerctl", "play-pause", NULL };
+static const char *p_next[] = {"playerctl", "next", NULL };
+static const char *p_prev[] = {"playerctl", "previous", NULL };
+
+
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f};
 static uint32_t colors[][3]                = {
   [SchemeNorm] = { 0xf2f4f8ff, 0x161616ff,     0x393939ff },
@@ -43,14 +48,17 @@ static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 static int log_level = WLR_ERROR;
 
 static const char *const autostart[] = {
-  "pkill awww-daemon", NULL,
   "awww-daemon", NULL,
   "awww", "img", "/home/danhs/Wallpapers/tplt.png", NULL,
+  "vesktop-bin", NULL,
+  "spotify", "--enable-features=UseOzonePlatform", "--ozone-platform=wayland", "%U", NULL,
+  NULL
 };
 
 static const Rule rules[] = {
-	{ "Gimp_EXAMPLE",     NULL,       0,            1,           -1 },
-	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           -1 },
+	{ "Gimp_EXAMPLE",     NULL,       0,            1,          -1 },
+  { "vesktop",          NULL,       1 << 4,       0,          -1},
+  { "spotify",          NULL,       1 << 5,       0,          -1},
 };
 
 static const Layout layouts[] = {
@@ -147,6 +155,10 @@ static const Key keys[] = {
   {0, XF86XK_AudioRaiseVolume, spawn, {.v = raisevol} },
   {0, XF86XK_AudioLowerVolume, spawn, {.v = lowervol} },
   {0, XF86XK_AudioMute, spawn, {.v = mutevol} },
+
+  {0, XF86XK_AudioPlay, spawn, {.v = play} },
+  {0, XF86XK_AudioNext, spawn, {.v = p_next} },
+  {0, XF86XK_AudioPrev, spawn, {.v = p_prev} },
 
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                        0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                            1),
