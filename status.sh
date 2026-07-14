@@ -14,7 +14,7 @@ while true; do
 
         if [ "$PLAYER_STATUS" = "Playing" ]; then
             ARTIST=$(playerctl -p spotify metadata --format "{{ artist }}" | xargs)
-            TITLE=$(playerctl -p spotify metadata --format "{{ title }}" | sed -E 's/ \((with|feat\.?)[^)]*\)//i' | xargs)
+            TITLE=$(playerctl -p spotify metadata --format "{{ title }}" | sed -E -e 's/ \((with|feat\.?)[^)]*\)//i' -e 's/ *\[v[0-9]+\]//i' | xargs)
 
             case "$ARTIST" in
                 "Lil Uzi Vert")     ARTIST="LUV" ;;
